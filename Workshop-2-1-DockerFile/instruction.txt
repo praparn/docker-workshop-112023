@@ -66,10 +66,10 @@ Part 3: RESTFUL Python
 
 4. Setup application stack by command: (Step-by-Step and Check)
 	(maindb: mariadb)
-	docker container run -dt --name maindb --net=restful_switch --network-alias=maindb -e MYSQL_ROOT_PASSWORD=password labdocker/mariadb:10.5.12
+	docker container run -dt --name maindb --net=restful_switch --network-alias=maindb -e MYSQL_ROOT_PASSWORD=password labdocker/mariadb:11.2.2
 
 	(cachedb: redis)
-	docker container run -dt --name cachedb --net=restful_switch --network-alias=cachedb labdocker/redis:latest
+	docker container run -dt --name cachedb --net=restful_switch --network-alias=cachedb labdocker/redis:alpine3.18
 
 	(webservice: pythonrestful)
 	docker container run -dt --name webservice --net=restful_switch --network-alias=webservice -p 5000:5000 labdocker/webservice:1.0

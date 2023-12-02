@@ -3,6 +3,7 @@ LABEL maintainer="Praparn Lueangphoonlap (eva10409@gmail.com)"
 LABEL Description="NodeJS/NGINX Build Container" Version="1.0"
 RUN apk update && \
     apk add curl --no-cache && rm -rf /var/cache/apk/*
+COPY main.py /usr/src/app/main.py
 EXPOSE 5000
 CMD [ "python", "main.py" ]
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
