@@ -7,20 +7,20 @@ Before Start Lab:
 Part 1: Host Path Debug Program
 ---------------------------------------------------------------------------------------------------------------
 1. Check folder "Workshop-1-7-Volume" by command
-	ls ~/docker-workshop-032023/Workshop-1-7-Volume
+	ls ~/docker-workshop-112023/Workshop-1-7-Volume
 
-2. Pull image of container for operate by command: "docker image pull labdocker/alpine:latest"
+2. Pull image of container for operate by command: "docker image pull labdocker/alpine:3.18.5"
 3. Run container with mapping volume by command:
 	docker container run -dt --name linenotify \
-	--mount type=bind,source=/home/ubuntu/docker-workshop-032023/Workshop-1-7-Volume/LINE_Notify,target=/nodejs \
-	labdocker/alpine:latest sh
+	--mount type=bind,source=/home/ubuntu/docker-workshop-112023/Workshop-1-7-Volume/LINE_Notify,target=/nodejs \
+	labdocker/alpine:3.18.5 sh
 
 4. Attach to container by command: docker container exec -it linenotify sh
 5. Update component by command:
 	apk update
 
 6. Install required module by command:
-	apk add nodejs nodejs-npm curl vim bash
+	apk add nodejs npm curl vim bash
 
 7. Set environment for make code operate by command:
 	export NODE_VERSION=v10.14.2-r0 
@@ -37,7 +37,7 @@ Part 1: Host Path Debug Program
 	node index.js
 
 9. Open another session and edit file index.js on VSCode and Test change sometext:
-	vi ~/docker-workshop-032023/Workshop-1-7-Volume/LINE_Notify/index.js 
+	vi ~/docker-workshop-112023/Workshop-1-7-Volume/LINE_Notify/index.js 
 	Line 36: var titleMSG="\n"+TITLE+"("+pID+")" ==> var titleMSG="\n"+TITLE+"("+pID+" Edit LINENOTIFY)"
 
 10. Rerun LINENotify on old session by command:
@@ -65,7 +65,7 @@ Part 2: Container Volume
 	docker volume ls
 
 2. Create web container (web1) by attach volume with command:
-	docker container run -dt --name web1 --mount source=datavol,target=/data labdocker/alpine:latest sh
+	docker container run -dt --name web1 --mount source=datavol,target=/data labdocker/alpine:3.18.5 sh
 
 3. Shell to container web1 and touch file on /data
 	docker container exec -it web1 sh
@@ -73,7 +73,7 @@ Part 2: Container Volume
 	exit
 
 4. Create web container (web2) by attach volume with command:
-	docker container run -dt --name web2 --mount source=datavol,target=/data labdocker/alpine:latest sh
+	docker container run -dt --name web2 --mount source=datavol,target=/data labdocker/alpine:3.18.5 sh
 
 5. Shell to container web2 and touch file on /data
 	docker container exec -it web2 sh
@@ -83,7 +83,7 @@ Part 2: Container Volume
 6. Create backup for volume /data by run container with command:
 	docker container run --rm --mount source=datavol,target=/data \
 	--mount type=bind,source=$(pwd),target=/backup \
-	labdocker/ubuntu:latest tar cvf /backup/vol001.tar /data
+	labdocker/alpine:3.18.5 tar cvf /backup/vol001.tar /data
 
 7. We will see backup file (vol001.tar):
 
@@ -94,8 +94,8 @@ Part 2: Container Volume
 
 9. Restore backup for volume /data by run container with command:
 	docker container run --rm --mount source=datavol,target=/data \
-	--mount type=bind,source=$(pwd),target=/backup  \
-	labdocker/ubuntu:latest bash -c "cd /data && tar xvf /backup/vol001.tar --strip 1"
+	--mount type=bind,source=/home/ubuntu,target=/backup  \
+	labdocker/alpine:3.18.5 tar xvf /backup/vol001.tar --strip 1 -C /data
 
 10. Check on any container for check file
 	docker container exec -it web1 sh

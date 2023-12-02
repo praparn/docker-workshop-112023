@@ -54,15 +54,15 @@ Part1: Reverse Proxy by DNS
     mkdir ~/kong/kong-configuration
 
 	10.2 Create database by command:
-	docker image pull postgres:13.6
+	docker image pull labdocker/postgres:16.1-alpine3.17
 	docker container run -dt --name kong-database \
     --network=webinternal -p 5432:5432 \
     --mount type=bind,source=/home/ubuntu/kong/postgres,target=/var/lib/postgresql/data \
     -e "POSTGRES_USER=kong" -e "POSTGRES_DB=kong" -e "POSTGRES_PASSWORD=kong" \
-    postgres:13.6
+    labdocker/postgres:16.1-alpine3.17
 
 	10.3 Initial database for kong by command:
-  docker image pull kong:2.7.1-alpine
+  docker image pull kong:latest
 	docker container run --rm \
      --network=webinternal \
      -e "KONG_DATABASE=postgres" \
@@ -70,7 +70,7 @@ Part1: Reverse Proxy by DNS
      -e "KONG_PG_PASSWORD=kong" \
      -e "KONG_PG_USER=kong" \
      -e "KONG_PG_DATABASE=kong" \
-     kong:2.7.1-alpine kong migrations bootstrap
+     labdocker/kong:3.5.0 kong migrations bootstrap
 
 	10.4 Run kong api gateway by command:
 	docker container run -d --name kong \
@@ -86,33 +86,29 @@ Part1: Reverse Proxy by DNS
      -e "KONG_PG_USER=kong" \
      -e "KONG_PG_DATABASE=kong" \
      -p 80:8000 \
-     -p 443:8443 \
+     -p 443:8444 \
      -p 8001:8001 \
-     -p 8444:8444 \
-     kong:2.7.1-alpine
+     -p 8002:8002 \
+     -p 8003:8003 \
+     -p 8004:8004 \
+     labdocker/kong:3.5.0
 
 	*Remark: 
-	:8000 on which Kong listens for incoming HTTP traffic from your clients, and forwards it to your upstream services.
-	:8443 on which Kong listens for incoming HTTPS traffic. This port has a similar behavior as the :8000 port, except that it expects HTTPS traffic only. This port can be disabled via the configuration file.
-	:8001 on which the Admin API used to configure Kong listens.
-	:8444 on which the Admin API listens for HTTPS traffic.
+	:8000 Default API Proxy Port
+	:8001 Default API Admin Port
+  :8002 Default Manager Port
+	:8003 Default DevPortal Port
+  :8004 Default Files Port
 
-	10.5 Install Konga GUI by command:
-    docker image pull pantsel/konga:next
-    docker container run -dt -p 1337:1337 \
-	--network=webinternal --name konga \
-    -e "NODE_ENV=production" -e "TOKEN_SECRET=0pc@ll@nt" \
-    pantsel/konga:next
-
-	10.6 Install PGAdmin by command:
-	  docker image pull dpage/pgadmin4:6.5
+	10.5 Install PGAdmin by command:
+	  docker image pull labdocker/pgadmin4:8.0
     docker container run -p 8080:80 --name pgadmin \
 	--network=webinternal -e "PGADMIN_DEFAULT_EMAIL=kong@localdomain.com" \
-    -e "PGADMIN_DEFAULT_PASSWORD=kong" -d dpage/pgadmin4:6.5
+    -e "PGADMIN_DEFAULT_PASSWORD=kong" -d labdocker/pgadmin4:8.0
 
 	10.7 (local) Test open GUI:
 	http://<public ip>:8080		==> PGAdmin (Email Address: kong@localdomain.com, Password: kong) ==> Add Server: <private ip>, username: kong, password:kong
-	http://<public ip>:1337		==> Konga (Username: kongadmin, Email Address: kong@localdomain.com, Password: P@ssw0rd) ==> Connect Kong: Name KONG, Kong Admin URL: http://<private ip>:8001
+	http://<public ip>:8002		==> Konga (Username: kongadmin, Email Address: kong@localdomain.com, Password: P@ssw0rd) ==> Connect Kong: Name KONG, Kong Admin URL: http://<private ip>:8001
 	
 	10.8 Test kong api (cli):
 	curl http://localhost:8001
@@ -154,13 +150,13 @@ curl -i -X POST \
   --url http://localhost:8001/services/service-webtestthailand/routes \
   --data 'name=route-webtestthailand' \
   --data 'hosts[]=webtestthailand.com' \
-  --data 'protocols=https' \
+  --data 'protocols=http' \
   --data 'paths=/nodejs' \
   --data 'strip_path=true'
 
 14. Open curl for test
 	curl -i -X GET \
-  --url https://<public ip/private ip>/nodejs --header 'Host: webtestthailand.com' -k
+  --url http://<public ip/private ip>/nodejs --header 'Host: webtestthailand.com' -k
 
 15. Enable authentication via api-key by command:
 	curl -i -X POST \
@@ -179,11 +175,11 @@ curl -i -X POST \
 
 	Without API-Key:
 	curl -i -X GET \
-  --url https://<public ip/private ip>/nodejs --header 'Host: webtestthailand.com' -k
+  --url http://<public ip/private ip>/nodejs --header 'Host: webtestthailand.com' -k
 
 	With API-Key:
 	curl -i -X GET \
-  --url https://<public ip/private ip>/nodejs --header 'Host: webtestthailand.com' --header "apikey: thisisfirsttestapikeypublic112345678" -k
+  --url http://<public ip/private ip>/nodejs --header 'Host: webtestthailand.com' --header "apikey: thisisfirsttestapikeypublic112345678" -k
 
 17. Clean up container with command:
 	docker container stop web1 web2 konga kong kong-database pgadmin
