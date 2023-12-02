@@ -1,4 +1,4 @@
-FROM labdocker/alpinepython:2.7-onbuild
+FROM labdocker/alpinepython:3.9.18-alpine3.18
 LABEL maintainer="Praparn Lueangphoonlap (eva10409@gmail.com)"
 LABEL Description="NodeJS/NGINX Build Container" Version="1.0"
 RUN apk update && \
