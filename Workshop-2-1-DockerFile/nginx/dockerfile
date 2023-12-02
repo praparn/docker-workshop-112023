@@ -5,7 +5,7 @@ ENV NODE_VERSION=v14.15.4 NPM_VERSION=v14.15.4
 RUN mkdir -p /run/nginx
 RUN apk update && \
     apk add nginx curl --no-cache && \
-    rm /etc/nginx/conf.d/default.conf && \
+    rm /etc/nginx/http.d/default.conf && \
     rm -rf /var/cache/apk/*
 COPY nginx.conf /etc/nginx/nginx.conf
 WORKDIR /usr/sbin
