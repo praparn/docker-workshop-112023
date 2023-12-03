@@ -3,7 +3,7 @@ from flask import Response
 from flask import request
 from redis import Redis
 from datetime import datetime
-import MySQLdb
+import mysql.connector
 import sys
 import redis
 import time
@@ -13,9 +13,14 @@ import json
 flagloop= 0
 app = Flask(__name__)
 startTime = datetime.now()
+
 while flagloop == 0:
     try:
-        db = MySQLdb.connect("maindb","root","password")
+        mydb = mysql.connector.connect(
+        host="maindb",
+        user="root",
+        password="password"
+        )
     except:
         time.sleep(2)
         continue
