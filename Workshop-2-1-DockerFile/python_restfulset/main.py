@@ -71,7 +71,8 @@ def remove_users(uid):
 def get_users(uid):
     hash = hashlib.sha224(uid.encode('utf-8')).hexdigest()
     #hash = hashlib.sha224(str(uid)).hexdigest()
-    key = "sql_cache:" + hash
+    key1 = "sql_cache:" + hash
+    key = key1.decode() + hash
     #curl http://<IP Host>:<Port>/users/<uid>
     if (CACHE_DB.get(key)):
         return CACHE_DB.get(key) + "(Database Cache)\n"
