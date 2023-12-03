@@ -46,9 +46,23 @@ Part1: Docker Bench for Security
 	sudo rm -rf ~/docker-bench-security
 
 -----------------------------------------------------------------------------------------------------------------
-Part2: Apparmor in Container
+Part2: Docker Image Scanning
 -----------------------------------------------------------------------------------------------------------------
-1. Run container for test default profile of Apparmor by command: "docker container run -dt --name sectestdefault labdocker/alpine:latest sh"
+1. Install grype (anchore) by command:
+    sudo su -
+	curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+    exit
+
+2. Run grype for image scanning:
+    grype labdocker/alpine:3.13.6
+	grype labdocker/alpine:3.18.5
+    grype kong:3.5.0
+
+
+-----------------------------------------------------------------------------------------------------------------
+Part3: Apparmor in Container
+-----------------------------------------------------------------------------------------------------------------
+1. Run container for test default profile of Apparmor by command: "docker container run -dt --name sectestdefault labdocker/alpine:3.18.5 sh"
 
 2. Access in to container and test some activity:
 	docker container exec -it sectestdefault sh
@@ -68,12 +82,12 @@ Part2: Apparmor in Container
 4. Stop test container by command: "docker container stop sectestdefault && docker container rm sectestdefault"
 
 5. Copy profile and Load apparmor restrict profile by command:
-	sudo apparmor_parser -r -W ~/docker-workshop-032023/Workshop-2-3-Docker-Security/restrict-apparmor
+	sudo apparmor_parser -r -W ~/docker-workshop-112023/Workshop-2-3-Docker-Security/restrict-apparmor
 
 6. Check current profile of apparmor by command: sudo aa-status
 
 7. Run container for test restrict profile of Apparmor by command:
-	docker container run -dt --name sectestrestrict --security-opt "apparmor=restrict-apparmor" labdocker/alpine:latest sh
+	docker container run -dt --name sectestrestrict --security-opt "apparmor=restrict-apparmor" labdocker/alpine:3.18.5 sh
 
 8. Access in to container and test some activity:
 	docker container exec -it sectestrestrict sh
@@ -92,16 +106,17 @@ Part2: Apparmor in Container
 
 10. Stop test container by command: "docker container stop sectestrestrict && docker container rm sectestrestrict"
 
-11. Remove apparmor profile by command: sudo apparmor_parser -R ~/docker-workshop-032023/Workshop-2-3-Docker-Security/restrict-apparmor && sudo aa-status
+11. Remove apparmor profile by command: sudo apparmor_parser -R ~/docker-workshop-112023/Workshop-2-3-Docker-Security/restrict-apparmor && sudo aa-status
+
 
 -----------------------------------------------------------------------------------------------------------------
-Part3: Content Trust (Signed Image)
+Part4: Content Trust (Signed Image)
 -----------------------------------------------------------------------------------------------------------------
 1. Enable content trust feature by command:
 export DOCKER_CONTENT_TRUST=1
 
 2. Create repository "alpine" on hub.docker.com and Tag image with out sign image and push to hub.docker.com by command:
-docker image tag labdocker/alpine:latest <username>/alpine:unsign
+docker image tag labdocker/alpine:3.18.5 <username>/alpine:unsign
 docker login
 docker image push --disable-content-trust=true <username>/alpine:unsign
 docker logout
@@ -117,7 +132,7 @@ docker image pull --disable-content-trust=true <username>/alpine:unsign
 docker image ls
 
 5. Tag image sign image and push to hub.docker.com by command:
-docker image tag labdocker/alpine:latest <username>/alpine:sign
+docker image tag labdocker/alpine:3.18.5 <username>/alpine:sign
 docker login
 docker image push <username>/alpine:sign
 	*Remark:
