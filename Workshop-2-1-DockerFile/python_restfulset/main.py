@@ -16,7 +16,7 @@ startTime = datetime.now()
 
 while flagloop == 0:
     try:
-        mydb = mysql.connector.connect(
+        db = mysql.connector.connect(
         host="maindb",
         user="root",
         password="password"
