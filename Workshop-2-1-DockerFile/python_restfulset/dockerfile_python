@@ -3,10 +3,11 @@ LABEL maintainer="Praparn Lueangphoonlap (eva10409@gmail.com)"
 LABEL Description="NodeJS/NGINX Build Container" Version="1.0"
 WORKDIR /usr/src/app
 RUN apk update && \
-    apk add curl --no-cache && rm -rf /var/cache/apk/*
+    apk add curl mariadb-dev --no-cache && rm -rf /var/cache/apk/*
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && apk del build-deps
 COPY main.py ./main.py
+
 EXPOSE 5000
 CMD [ "python3", "main.py" ]
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
