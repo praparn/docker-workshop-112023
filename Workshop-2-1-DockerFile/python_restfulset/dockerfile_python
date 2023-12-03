@@ -1,11 +1,13 @@
 FROM labdocker/alpinepython:3.9.18-alpine3.18
 LABEL maintainer="Praparn Lueangphoonlap (eva10409@gmail.com)"
 LABEL Description="NodeJS/NGINX Build Container" Version="1.0"
-RUN apk update && \
-    apk add curl --no-cache && rm -rf /var/cache/apk/* && mkdir /usr/src/app
-COPY main.py /usr/src/app/main.py
 WORKDIR /usr/src/app
+RUN apk update && \
+    apk add curl --no-cache && rm -rf /var/cache/apk/*
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY main.py ./main.py
 EXPOSE 5000
-CMD [ "python3", "/usr/src/app/main.py/main.py" ]
+CMD [ "python3", "main.py" ]
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:5000/ || exit 1
