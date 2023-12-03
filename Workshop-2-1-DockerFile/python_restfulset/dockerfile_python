@@ -3,7 +3,7 @@ LABEL maintainer="Praparn Lueangphoonlap (eva10409@gmail.com)"
 LABEL Description="NodeJS/NGINX Build Container" Version="1.0"
 WORKDIR /usr/src/app
 RUN apk update && \
-    apk add curl mariadb-dev --no-cache && apk add --no-cache --virtual .build-deps gcc musl-dev && rm -rf /var/cache/apk/*
+    apk add curl mariadb-dev --no-cache && apk add --no-cache --virtual .pynacl_deps build-base python3-dev libffi-dev && rm -rf /var/cache/apk/*
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt && apk del build-deps
 COPY main.py ./main.py
